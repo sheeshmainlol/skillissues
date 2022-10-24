@@ -1,0 +1,170 @@
+
+--//Locals\\
+
+getgenv().Pickaxe = nil
+getgenv().Location = nil
+getgenv().TweenTp = false -- Sem Teleport (Mais Seguro Acho)
+getgenv().RangeMine = 10 -- Range De Minerar 10 é o maximo
+getgenv().OreSelect = "nil" -- Em Breve (Talvez)
+
+
+
+--//Library\\
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+
+local Window = Library.CreateLib("CraftWars KnockOff (By External)", "DarkTheme")
+local Tab = Window:NewTab("Auto Farm")
+local Section = Tab:NewSection("Mine Auto Farm")
+
+--//Auto Mine\\
+
+Section:NewTextBox("Pickaxe", "Pickaxe Name", function(txt)
+	print(txt)
+	getgenv().Pickaxe = txt
+end)
+
+Section:NewDropdown("Mines", "DropdownInf", {"Normal Mine", "Advanced Mine"}, function(currentOption)
+    
+    print(currentOption)
+    if currentOption == "Normal Mine" then
+       getgenv().Location = "OreMines"
+    end
+    if currentOption == "Advanced Mine" then
+       getgenv().Location = "OreMines2"
+    end
+    
+end)
+
+Section:NewToggle("TweenTp", "ToggleInfo", function(state)
+    if state then
+        print("Toggle On")
+        getgenv().TweenTp = true
+    else
+        print("Toggle Off")
+        getgenv().TweenTp = false
+    end
+end)
+
+Section:NewButton("Start Auto Mine", "ButtonInfo", function()
+    print("Clicked")
+
+if getgenv().Location == nil or getgenv().Pickaxe == nil then
+   warn("Select Things")
+   return
+end
+
+local Char = game.Players.LocalPlayer.Character
+local CanHit = true
+local Humanoid = Char:WaitForChild("Humanoid")
+
+local plr = game:service"Players".LocalPlayer;
+local tween_s = game:service"TweenService";
+local info = TweenInfo.new(1,Enum.EasingStyle.Quad);
+function tp(...)
+   local tic_k = tick();
+   local params = {...};
+   local cframe = ...;
+   local tween,err = pcall(function()
+       local tween = tween_s:Create(plr.Character["HumanoidRootPart"],info,{CFrame=cframe});
+       tween:Play();
+
+   end)
+   if not tween then return warn("Error") end
+end
+
+function Hit(who)
+   pcall(function()
+    local args = {
+    [1] = "hit",
+    [2] = {
+      ["char"] = game:GetService("Players").LocalPlayer.Character,
+      ["soundid"] = "rbxassetid://0",
+      ["target"] = who
+    }
+  }
+
+   game:GetService("Players").LocalPlayer.Character:FindFirstChild(getgenv().Pickaxe).Use:InvokeServer(unpack(args))   
+end) 
+end
+
+
+
+local function GetOre()
+   currentOre = nil
+pcall(function()
+   
+   for k, v in next, workspace.Global[getgenv().Location]:GetChildren() do
+      if (v:FindFirstChild('Head')) then
+         currentOre = v.Head
+     end 
+   end
+end)
+
+return currentOre
+    
+   
+end
+
+
+warn("Auto Mine Started")
+
+
+
+coroutine.resume(coroutine.create(function()
+while (wait(.5)) do
+
+if Humanoid.Health < 1 then
+   Char.Torso.Anchored = false
+   break
+end
+
+pcall(function()
+
+    local Ore = GetOre()
+    Ore.CanCollide = false
+
+    if getgenv().TweenTp == false then
+    Char.HumanoidRootPart.CFrame = Ore.CFrame * CFrame.new(0,1,0)
+    end
+    if getgenv().TweenTp == true then
+    tp(Ore.CFrame * CFrame.new(0,1,0))
+    end
+   
+
+
+    
+   wait(.2)
+end)
+end
+end))
+
+
+
+
+--//Hit\\
+
+coroutine.resume(coroutine.create(function()
+
+while(wait(.5)) do
+
+
+ if Humanoid.Health < 1 then
+   break
+ end
+ 
+ for _,v in pairs(game.Workspace.Global[Location]:GetChildren()) do
+     if v:FindFirstChild("Head") and v.Head:FindFirstChild("Ore") then
+          range = (Char.HumanoidRootPart.CFrame.Position - v.Head.CFrame.Position).Magnitude
+          if range < getgenv().RangeMine then
+          Hit(v)
+          end
+    end
+end
+
+end
+end))
+
+--
+end)
+
+--//Etc\\
