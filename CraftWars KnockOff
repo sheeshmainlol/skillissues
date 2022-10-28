@@ -95,6 +95,8 @@ local Button = Tab:CreateButton({
     print("Clicked")
     
 
+
+
 local Char = game.Players.LocalPlayer.Character
 local CanHit = true
 local Humanoid = Char:WaitForChild("Humanoid")
@@ -155,8 +157,17 @@ warn("Auto Mine Started")
 coroutine.resume(coroutine.create(function()
 while (task.wait(.5)) do
 
+game.Workspace.Global.Warps.MinesReturn.Teleporter.CanTouch = false
+game.Workspace.Global.Warps.Mines2Return.Teleporter.CanTouch = false
+game.Workspace.Global.Warps.Mines3Return.Teleporter.CanTouch = false
+game.Workspace.Global.Warps.Mines4Return.Teleporter.CanTouch = false
+
 if Humanoid.Health < 1 then
    Char.Torso.Anchored = false
+   game.Workspace.Global.Warps.MinesReturn.Teleporter.CanTouch = true
+   game.Workspace.Global.Warps.Mines2Return.Teleporter.CanTouch = true
+   game.Workspace.Global.Warps.Mines3Return.Teleporter.CanTouch = true
+   game.Workspace.Global.Warps.Mines4Return.Teleporter.CanTouch = true
    break
 end
 
@@ -267,6 +278,15 @@ local Button = Tab2:CreateButton({
     
     
 	end,
+})
+
+local Button = Tab2:CreateButton({
+	Name = "Infinite Yield (Have Dex and Remote Spy)",
+	Callback = function()
+	pcall(function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end)
+end,
 })
 
 
