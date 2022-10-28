@@ -3,55 +3,97 @@
 
 getgenv().Pickaxe = nil
 getgenv().Location = nil
-getgenv().TweenTp = false -- Sem Teleport (Mais Seguro Acho)
+getgenv().TweenTp = nil -- Sem Teleport (Mais Seguro Acho)
 getgenv().RangeMine = 10 -- Range De Minerar 10 é o maximo
 getgenv().OreSelect = "nil" -- Em Breve (Talvez)
 
+getgenv().SecureMode = true
+
+
+--//Player\\
 
 
 --//Library\\
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
-local Window = Library.CreateLib("CraftWars KnockOff (By External)", "DarkTheme")
-local Tab = Window:NewTab("Auto Farm")
-local Section = Tab:NewSection("Mine Auto Farm")
+
+
+
+local Window = Rayfield:CreateWindow({
+Name = "CraftWars KnockOff Gui",
+LoadingTitle = "CraftWars KnockOff Gui",
+LoadingSubtitle = "by External",
+ConfigurationSaving = {
+	Enabled = true,
+	FileName = "External Gui",
+},
+KeySystem = false, -- Set this to true to use our key system
+KeySettings = {
+	Title = "Sirius Hub",
+	Subtitle = "Key System",
+	Note = "Join the discord (discord.gg/sirius)",
+	Key = "ABCDEF"
+}
+})
+
+
+local Tab = Window:CreateTab("Auto Farm")
+local Tab2 = Window:CreateTab("Local Player")
+
+
+local Section = Tab:CreateSection("Auto Mine")
+local Section2 = Tab2:CreateSection("Player")
+
 
 --//Auto Mine\\
 
-Section:NewTextBox("Pickaxe", "Pickaxe Name", function(txt)
-	print(txt)
-	getgenv().Pickaxe = txt
-end)
 
-Section:NewDropdown("Mines", "DropdownInf", {"Normal Mine", "Advanced Mine"}, function(currentOption)
-    
-    print(currentOption)
-    if currentOption == "Normal Mine" then
+local Input = Tab:CreateInput({
+	Name = "Pickaxe",
+	PlaceholderText = "Pickaxe Name",
+	RemoveTextAfterFocusLost = false,
+	Callback = function(Text)
+	    getgenv().Pickaxe = Text
+		print(Text)
+	end,
+})
+
+
+local Dropdown = Tab:CreateDropdown({
+	Name = "Mines",
+	Options = {"Normal Mine","Advanced Mine"},
+	CurrentOption = "Option 1",
+	Flag = "MinesDropDown", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Option)
+	print(Option)
+    if Option == "Normal Mine" then
        getgenv().Location = "OreMines"
     end
-    if currentOption == "Advanced Mine" then
+    if Option == "Advanced Mine" then
        getgenv().Location = "OreMines2"
     end
     
-end)
+	end,
+})
 
-Section:NewToggle("TweenTp", "ToggleInfo", function(state)
-    if state then
-        print("Toggle On")
-        getgenv().TweenTp = true
-    else
-        print("Toggle Off")
-        getgenv().TweenTp = false
-    end
-end)
+local Toggle = Tab:CreateToggle({
+	Name = "TweenTp",
+	CurrentValue = false,
+	Flag = "TweenTpToggle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		getgenv().TweenTp = Value
+		print(Value)
+	end,
+})
 
-Section:NewButton("Start Auto Mine", "ButtonInfo", function()
+
+
+local Button = Tab:CreateButton({
+	Name = "Start Auto Mine",
+	Callback = function()
+
     print("Clicked")
-
-if getgenv().Location == nil or getgenv().Pickaxe == nil then
-   warn("Select Things")
-   return
-end
+    
 
 local Char = game.Players.LocalPlayer.Character
 local CanHit = true
@@ -111,7 +153,7 @@ warn("Auto Mine Started")
 
 
 coroutine.resume(coroutine.create(function()
-while (wait(.5)) do
+while (task.wait(.5)) do
 
 if Humanoid.Health < 1 then
    Char.Torso.Anchored = false
@@ -133,19 +175,16 @@ pcall(function()
 
 
     
-   wait(.2)
+   task.wait(.2)
 end)
 end
 end))
-
-
-
 
 --//Hit\\
 
 coroutine.resume(coroutine.create(function()
 
-while(wait(.5)) do
+while(task.wait(.5)) do
 
 
  if Humanoid.Health < 1 then
@@ -164,7 +203,75 @@ end
 end
 end))
 
+
 --
-end)
+end,
+})
+
+--//Local Player\\
+
+local Slider = Tab2:CreateSlider({
+	Name = "WalkSpeed",
+	Range = {0, 200},
+	Increment = 1,
+	Suffix = "WalkSpeed",
+	CurrentValue = 16,
+	--Flag = "WalkSpeedSlider", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+	pcall(function()
+	local Player = game.Players.LocalPlayer
+    local Char = Player.Character
+    local Humanoid = Char:WaitForChild("Humanoid")
+    
+		Humanoid.WalkSpeed = Value
+	end)
+	end,
+})
+
+local Slider = Tab2:CreateSlider({
+	Name = "Jump Power",
+	Range = {0, 200},
+	Increment = 1,
+	Suffix = "Jump Power",
+	CurrentValue = 16,
+	--Flag = "JumpPowerSlider", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+	pcall(function()
+	local Player = game.Players.LocalPlayer
+    local Char = Player.Character
+    local Humanoid = Char:WaitForChild("Humanoid")
+    
+    
+		Humanoid.JumpPower = Value
+	end)
+	end,
+})
+
+
+local Section3 = Tab2:CreateSection("Others")
+local Button = Tab2:CreateButton({
+	Name = "Ctrl Delete",
+	Callback = function()
+	pcall(function()
+    local Plr = game:GetService("Players").LocalPlayer
+    local Mouse = Plr:GetMouse()
+
+    Mouse.Button1Down:connect(function()
+    pcall(function()
+    if not game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftControl) then return end
+    if not Mouse.Target then return end
+    Mouse.Target:Destroy()
+    end)
+    end)
+    end)
+    
+    
+	end,
+})
+
 
 --//Etc\\
+Rayfield:LoadConfiguration()
+Rayfield:Notify("Warn!","Script Loaded Enjoy!!",10010348543)
+
+
