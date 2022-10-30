@@ -221,6 +221,25 @@ end,
 
 --//Local Player\\
 
+local Section3 = Tab2:CreateSection("Op Stuff")
+
+local Button = Tab2:CreateButton({
+	Name = "Equip Every Weapon In ToolBar",
+	Callback = function()
+	pcall(function()
+   for _, tool in ipairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+    if tool:IsA("Tool") then
+         tool.Parent = game:GetService("Players").LocalPlayer.Character -- I didn't use Equip because the Equip function unequips any other tools in your character.
+    end
+end
+end)
+    
+    
+	end,
+})
+
+local Section4 = Tab2:CreateSection("Others")
+
 local Slider = Tab2:CreateSlider({
 	Name = "WalkSpeed",
 	Range = {0, 200},
