@@ -5,9 +5,15 @@ getgenv().Pickaxe = nil
 getgenv().Location = nil
 getgenv().TweenTp = nil -- Sem Teleport (Mais Seguro Acho)
 getgenv().RangeMine = 10 -- Range De Minerar 10 é o maximo
+getgenv().NpcFarmDis = 4
 getgenv().OreSelect = "nil" -- Em Breve (Talvez)
+getgenv().NpcFarm = false
+getgenv().NpcFarmDungeon = false
+getgenv().MineFarming = false
 
 getgenv().SecureMode = true
+
+getgenv().Anti = true -- Re-Execute if you change it
 
 
 --//Player\\
@@ -43,6 +49,55 @@ local Tab2 = Window:CreateTab("Local Player")
 
 local Section = Tab:CreateSection("Auto Mine")
 local Section2 = Tab2:CreateSection("Player")
+
+--//Functions\\
+
+local function GetNpc()
+   currentNpc = nil
+
+   pcall(function()
+   
+      local NPCFolder = workspace.Global.NPCs
+   
+   for k, v in next, NPCFolder:GetChildren() do
+      if v.Parent ~= nil and v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid").Health > 0 then
+        
+        currentNpc = v
+        
+       
+       
+   end
+   
+  end
+ end)
+ 
+ return currentNpc
+
+end
+
+
+local function GetNpcDungeon()
+   currentNpc = nil
+
+   pcall(function()
+   
+   local NPCFolder = workspace.Global["NPCs Dungeon"]
+   
+   for k, v in next, NPCFolder:GetChildren() do
+      if v.Parent ~= nil and v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid").Health > 0 then
+        
+        currentNpc = v
+        
+       
+       
+   end
+   
+  end
+ end)
+ 
+ return currentNpc
+
+end
 
 
 --//Auto Mine\\
@@ -131,8 +186,6 @@ function Hit(who)
 end) 
 end
 
-
-
 local function GetOre()
    currentOre = nil
 pcall(function()
@@ -161,8 +214,10 @@ game.Workspace.Global.Warps.MinesReturn.Teleporter.CanTouch = false
 game.Workspace.Global.Warps.Mines2Return.Teleporter.CanTouch = false
 game.Workspace.Global.Warps.Mines3Return.Teleporter.CanTouch = false
 game.Workspace.Global.Warps.Mines4Return.Teleporter.CanTouch = false
+MineFarming = true
 
 if Humanoid.Health < 1 then
+MineFarming = false
    Char.Torso.Anchored = false
    game.Workspace.Global.Warps.MinesReturn.Teleporter.CanTouch = true
    game.Workspace.Global.Warps.Mines2Return.Teleporter.CanTouch = true
@@ -177,7 +232,7 @@ pcall(function()
     Ore.CanCollide = false
 
     if getgenv().TweenTp == false then
-    Char.HumanoidRootPart.CFrame = Ore.CFrame * CFrame.new(0,1,0)
+    Char.PrimaryPart.CFrame = Ore.CFrame * CFrame.new(0,1,0)
     end
     if getgenv().TweenTp == true then
     tp(Ore.CFrame * CFrame.new(0,1,0))
@@ -219,9 +274,91 @@ end))
 end,
 })
 
+
+--//Npc AutoFarm\\
+
+local Section3 = Tab:CreateSection("Auto Farm Npc")
+
+local Slider = Tab:CreateSlider({
+	Name = "Distance",
+	Range = {0, 40},
+	Increment = 1,
+	Suffix = "Distance",
+	CurrentValue = 4,
+	--Flag = "JumpPowerSlider", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+	pcall(function()
+        getgenv().NpcFarmDis = Value
+	end)
+	end,
+})
+
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Farm Npc",
+	CurrentValue = false,
+	Flag = "AutoFarmNpcToogle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		getgenv().NpcFarm = Value
+		print(Value)
+	end,
+})
+
+
+coroutine.resume(coroutine.create(function()
+ while true do task.wait()
+if getgenv().NpcFarm == false and MineFarming == false then
+pcall(function()
+   GetNpc().HumanoidRootPart.Anchored = false
+  end)
+end
+   
+if getgenv().NpcFarm == true then
+pcall(function()
+local Char = game.Players.LocalPlayer.Character
+ GetNpc().HumanoidRootPart.Anchored = true
+  GetNpc().HumanoidRootPart.CFrame = Char.HumanoidRootPart.CFrame * CFrame.new(0,0,-getgenv().NpcFarmDis)
+ end)  
+ end
+end
+   
+
+end))
+
+
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Farm Dungeon Npc",
+	CurrentValue = false,
+	Flag = "AutoFarmNpcDungeonToogle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		getgenv().NpcFarmDungeon = Value
+		print(Value)
+	end,
+})
+
+
+coroutine.resume(coroutine.create(function()
+ while true do task.wait()
+if getgenv().NpcFarmDungeon == false and MineFarming == false then
+pcall(function()
+   GetNpcDungeon().HumanoidRootPart.Anchored = false
+  end)
+end
+   
+if getgenv().NpcFarmDungeon == true then
+pcall(function()
+local Char = game.Players.LocalPlayer.Character
+ GetNpcDungeon().HumanoidRootPart.Anchored = true
+  GetNpcDungeon().HumanoidRootPart.CFrame = Char.HumanoidRootPart.CFrame * CFrame.new(0,0,-getgenv().NpcFarmDis)
+ end)  
+ end
+end
+   
+
+end))
+
 --//Local Player\\
 
-local Section3 = Tab2:CreateSection("Op Stuff")
+local Section4 = Tab2:CreateSection("Op Stuff")
 
 local Button = Tab2:CreateButton({
 	Name = "Equip Every Weapon In ToolBar",
@@ -238,7 +375,20 @@ end)
 	end,
 })
 
-local Section4 = Tab2:CreateSection("Others")
+
+local Button = Tab2:CreateButton({
+	Name = "Invisible (Keybind R)",
+	Callback = function()
+	pcall(function()
+    _G.key = Enum.KeyCode.R
+    loadstring(game:HttpGet("https://paste.gg/p/anonymous/cb1c7198b269449eb8a2cf8ced061bed/files/4a98e88f82ee47388b3030a7f000b34e/raw", true))()
+end)
+    
+    
+	end,
+})
+
+local Section5 = Tab2:CreateSection("Player")
 
 local Slider = Tab2:CreateSlider({
 	Name = "WalkSpeed",
@@ -278,7 +428,7 @@ local Slider = Tab2:CreateSlider({
 })
 
 
-local Section3 = Tab2:CreateSection("Others")
+local Section6 = Tab2:CreateSection("Others")
 local Button = Tab2:CreateButton({
 	Name = "Ctrl Delete",
 	Callback = function()
@@ -309,8 +459,36 @@ end,
 })
 
 
+--//Setup Scripts\\
+
+--//Anti Local Kick\\
+
+local plr = game:GetService("Players").LocalPlayer
+
+local Anti
+Anti = hookmetamethod(game, "__namecall", function(self, ...)
+        if self == plr and getnamecallmethod():lower() == "kick" and getgenv().Anti then
+            return warn("[ANTI-KICK] Client Tried To Call Kick Function On LocalPlayer")
+        end
+        return Anti(self, ...)
+    end)
+
+--//Anti AFK Script\\
+
+local VirtualUser=game:service'VirtualUser'
+game:service'Players'.LocalPlayer.Idled:connect(function()
+VirtualUser:CaptureController()
+VirtualUser:ClickButton2(Vector2.new())
+end)
+
+	pcall(function()
+	   game.Players.LocalPlayer.Backpack.Security:Destroy()
+	end)
+
+
+
 --//Etc\\
 Rayfield:LoadConfiguration()
-Rayfield:Notify("Warn!","Script Loaded Enjoy!!",10010348543)
+--Rayfield:Notify("Warn!","Script Loaded Enjoy!!",nil)
 
 
