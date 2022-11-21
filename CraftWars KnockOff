@@ -20,35 +20,43 @@ getgenv().Anti = true -- Re-Execute if you change it
 
 
 --//Library\\
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/sheeshmainlol/RayFieldUiLibraryMod/main/RayFieldUi'))()
 
 
 
 
 local Window = Rayfield:CreateWindow({
-Name = "CraftWars KnockOff Gui",
-LoadingTitle = "CraftWars KnockOff Gui",
-LoadingSubtitle = "by External",
-ConfigurationSaving = {
-	Enabled = true,
-	FileName = "External Gui",
-},
-KeySystem = false, -- Set this to true to use our key system
-KeySettings = {
-	Title = "Sirius Hub",
-	Subtitle = "Key System",
-	Note = "Join the discord (discord.gg/sirius)",
-	Key = "ABCDEF"
-}
+	Name = "CraftWars KnockOff Gui",
+	LoadingTitle = "CraftWars KnockOff Gui",
+	LoadingSubtitle = "by External",
+	ConfigurationSaving = {
+		Enabled = true,
+		FolderName = nil, -- Create a custom folder for your hub/game
+		FileName = "ExternalHubFolder"
+	},
+        Discord = {
+        	Enabled = false,
+        	Invite = "sirius", -- The Discord invite code, do not include discord.gg/
+        	RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+        },
+	KeySystem = false, -- Set this to true to use our key system
+	KeySettings = {
+		Title = "Sirius Hub",
+		Subtitle = "Key System",
+		Note = "Join the discord (discord.gg/sirius)",
+		FileName = "SiriusKey",
+		SaveKey = true,
+		GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+		Key = "Hello"
+	}
 })
 
 
-local Tab = Window:CreateTab("Auto Farm")
-local Tab2 = Window:CreateTab("Local Player")
+local Tab = Window:CreateTab("Auto Farm", 4483362458)
+local Tab2 = Window:CreateTab("LocalPlayer", 4483362458)
 
 
 local Section = Tab:CreateSection("Auto Mine")
-local Section2 = Tab2:CreateSection("Player")
 
 --//Functions\\
 
@@ -152,6 +160,16 @@ local Button = Tab:CreateButton({
 
 
 
+if getgenv().Pickaxe == nil or getgenv().Location == nil or getgenv().TweenTp == nil then
+Rayfield:Notify({
+    Title = "Warn!",
+    Content = "Select Configs",
+    Duration = 4,
+    Image = 4483362458,
+})
+return
+end
+
 local Char = game.Players.LocalPlayer.Character
 local CanHit = true
 local Humanoid = Char:WaitForChild("Humanoid")
@@ -203,7 +221,12 @@ return currentOre
 end
 
 
-warn("Auto Mine Started")
+Rayfield:Notify({
+    Title = "Warn!",
+    Content = "Auto Mine Started",
+    Duration = 4,
+    Image = 4483362458,
+})
 
 
 
@@ -252,11 +275,11 @@ coroutine.resume(coroutine.create(function()
 
 while(task.wait(.5)) do
 
-
- if Humanoid.Health < 1 then
+ if Humanoid and Humanoid.Health < 1 then
    break
  end
  
+
  for _,v in pairs(game.Workspace.Global[Location]:GetChildren()) do
      if v:FindFirstChild("Head") and v.Head:FindFirstChild("Ore") then
           range = (Char.HumanoidRootPart.CFrame.Position - v.Head.CFrame.Position).Magnitude
@@ -265,7 +288,6 @@ while(task.wait(.5)) do
           end
     end
 end
-
 end
 end))
 
@@ -299,9 +321,14 @@ local Toggle = Tab:CreateToggle({
 	Flag = "AutoFarmNpcToogle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 	Callback = function(Value)
 		getgenv().NpcFarm = Value
+		
 		print(Value)
+
+
 	end,
 })
+
+
 
 
 coroutine.resume(coroutine.create(function()
@@ -332,9 +359,25 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(Value)
 		getgenv().NpcFarmDungeon = Value
 		print(Value)
+--[[if getgenv().NpcFarmDungeon == true then
+Rayfield:Notify({
+    Title = "Warn!",
+    Content = "Npc Farm Dungeon Set: False",
+    Duration = 4,
+    Image = 4483362458,
+})
+else
+	Rayfield:Notify({
+    Title = "Warn!",
+    Content = "Npc Farm Dungeon Set: True",
+    Duration = 4,
+    Image = 4483362458,
+})
+end--]]
+
+
 	end,
 })
-
 
 coroutine.resume(coroutine.create(function()
  while true do task.wait()
@@ -489,6 +532,12 @@ end)
 
 --//Etc\\
 Rayfield:LoadConfiguration()
---Rayfield:Notify("Warn!","Script Loaded Enjoy!!",nil)
 
+Rayfield:Notify({
+    Title = "Warn!",
+    Content = "Script Loaded Enjoy",
+    Duration = 4,
+    Image = 4483362458,
+})
+--Rayfield:Notify("Warn!","Script Loaded Enjoy!!",nil)
 
