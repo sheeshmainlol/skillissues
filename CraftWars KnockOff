@@ -31,8 +31,8 @@ local Window = Rayfield:CreateWindow({
 	LoadingSubtitle = "by External",
 	ConfigurationSaving = {
 		Enabled = true,
-		FolderName = nil, -- Create a custom folder for your hub/game
-		FileName = "ExternalHubFolder"
+		FolderName = "ExternalHubFolder", -- Create a custom folder for your hub/game
+		FileName = "ExternalHubConfig"
 	},
         Discord = {
         	Enabled = false,
